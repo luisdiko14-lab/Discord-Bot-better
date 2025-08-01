@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Bot Management Dashboard</title>
+    <meta name="description" content="Comprehensive Discord bot management system with moderation, music, anti-nuke protection, and real-time monitoring.">
+    
+    <!-- Open Graph tags -->
+    <meta property="og:title" content="Discord Bot Management Dashboard">
+    <meta property="og:description" content="Manage your Discord bot with advanced moderation tools, music configuration, anti-nuke protection, and real-time monitoring.">
+    <meta property="og:type" content="website">
+    
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <i class="fab fa-discord"></i>
+                        <h1>Bot Dashboard</h1>
+                    </div>
+                    <div class="header-actions">
+                        <div class="status-indicator" id="connectionStatus">
+                            <i class="fas fa-circle"></i>
+                            <span>Connecting...</span>
+                        </div>
+                        <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="container">
+                <!-- Navigation Tabs -->
+                <nav class="nav-tabs">
+                    <button class="nav-tab active" data-tab="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        Dashboard
+                    </button>
+                    <button class="nav-tab" data-tab="bots">
+                        <i class="fas fa-robot"></i>
+                        Bots
+                    </button>
+                    <button class="nav-tab" data-tab="servers">
+                        <i class="fas fa-server"></i>
+                        Servers
+                    </button>
+                    <button class="nav-tab" data-tab="moderation">
+                        <i class="fas fa-shield-alt"></i>
+                        Moderation
+                    </button>
+                    <button class="nav-tab" data-tab="music">
+                        <i class="fas fa-music"></i>
+                        Music
+                    </button>
+                    <button class="nav-tab" data-tab="antinuke">
+                        <i class="fas fa-shield-virus"></i>
+                        Anti-Nuke
+                    </button>
+                    <button class="nav-tab" data-tab="commands">
+                        <i class="fas fa-terminal"></i>
+                        Commands
+                    </button>
+                    <button class="nav-tab" data-tab="logs">
+                        <i class="fas fa-file-alt"></i>
+                        Logs
+                    </button>
+                </nav>
+
+                <!-- Tab Contents -->
+                <div class="tab-content">
+                    <!-- Dashboard Tab -->
+                    <div class="tab-pane active" id="dashboard">
+                        <div class="dashboard-grid">
+                            <div class="stats-card">
+                                <div class="stats-header">
+                                    <h3>Bot Status</h3>
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <div class="stats-content">
+                                    <div class="stat-item">
+                                        <span class="stat-value" id="totalBots">0</span>
+                                        <span class="stat-label">Total Bots</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-value online" id="onlineBots">0</span>
+                                        <span class="stat-label">Online</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stats-card">
+                                <div class="stats-header">
+                                    <h3>Servers</h3>
+                                    <i class="fas fa-server"></i>
+                                </div>
+                                <div class="stats-content">
+                                    <div class="stat-item">
+                                        <span class="stat-value" id="totalServers">0</span>
+                                        <span class="stat-label">Total Servers</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-value" id="activeServers">0</span>
+                                        <span class="stat-label">Active</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="stats-card">
+                                <div class="stats-header">
+                                    <h3>Protection</h3>
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <div class="stats-content">
+                                    <div class="stat-item">
+                                        <span class="stat-value" id="protectedServers">0</span>
+                                        <span class="stat-label">Protected</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-value" id="blockedThreats">0</span>
+                                        <span class="stat-label">Threats Blocked</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="activity-feed">
+                                <div class="card-header">
+                                    <h3>Recent Activity</h3>
+                                    <button class="btn-refresh" id="refreshActivity">
+                                        <i class="fas fa-refresh"></i>
+                                    </button>
+                                </div>
+                                <div class="activity-list" id="activityList">
+                                    <div class="activity-item">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>Dashboard initialized</span>
+                                        <time class="activity-time">Just now</time>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bots Tab -->
+                    <div class="tab-pane" id="bots">
+                        <div class="tab-header">
+                            <h2>Bot Management</h2>
+                            <button class="btn btn-primary" id="addBotBtn">
+                                <i class="fas fa-plus"></i>
+                                Add Bot
+                            </button>
+                        </div>
+                        <div class="bots-grid" id="botsGrid">
+                            <!-- Bot cards will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Servers Tab -->
+                    <div class="tab-pane" id="servers">
+                        <div class="tab-header">
+                            <h2>Server Management</h2>
+                            <button class="btn btn-primary" id="addServerBtn">
+                                <i class="fas fa-plus"></i>
+                                Add Server
+                            </button>
+                        </div>
+                        <div class="servers-grid" id="serversGrid">
+                            <!-- Server cards will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Moderation Tab -->
+                    <div class="tab-pane" id="moderation">
+                        <div class="tab-header">
+                            <h2>Moderation Commands</h2>
+                            <select class="server-select" id="moderationServerSelect">
+                                <option value="">Select a server...</option>
+                            </select>
+                        </div>
+                        <div class="moderation-commands" id="moderationCommands">
+                            <!-- Moderation commands will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Music Tab -->
+                    <div class="tab-pane" id="music">
+                        <div class="tab-header">
+                            <h2>Music Configuration</h2>
+                            <select class="server-select" id="musicServerSelect">
+                                <option value="">Select a server...</option>
+                            </select>
+                        </div>
+                        <div class="music-config" id="musicConfig">
+                            <!-- Music configuration will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Anti-Nuke Tab -->
+                    <div class="tab-pane" id="antinuke">
+                        <div class="tab-header">
+                            <h2>Anti-Nuke Protection</h2>
+                            <select class="server-select" id="antiNukeServerSelect">
+                                <option value="">Select a server...</option>
+                            </select>
+                        </div>
+                        <div class="antinuke-config" id="antiNukeConfig">
+                            <!-- Anti-nuke configuration will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Commands Tab -->
+                    <div class="tab-pane" id="commands">
+                        <div class="tab-header">
+                            <h2>Custom Commands</h2>
+                            <div class="tab-actions">
+                                <select class="server-select" id="commandsServerSelect">
+                                    <option value="">Select a server...</option>
+                                </select>
+                                <button class="btn btn-primary" id="addCommandBtn">
+                                    <i class="fas fa-plus"></i>
+                                    Add Command
+                                </button>
+                            </div>
+                        </div>
+                        <div class="commands-grid" id="commandsGrid">
+                            <!-- Custom commands will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Logs Tab -->
+                    <div class="tab-pane" id="logs">
+                        <div class="tab-header">
+                            <h2>Activity Logs</h2>
+                            <div class="log-filters">
+                                <select class="server-select" id="logsServerSelect">
+                                    <option value="">All servers...</option>
+                                </select>
+                                <select class="server-select" id="logsBotSelect">
+                                    <option value="">All bots...</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="logs-container" id="logsContainer">
+                            <!-- Activity logs will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="botModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="botModalTitle">Add Bot</h3>
+                <button class="modal-close" id="closeBotModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="botForm">
+                <div class="form-group">
+                    <label for="botName">Bot Name</label>
+                    <input type="text" id="botName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="botToken">Bot Token</label>
+                    <input type="password" id="botToken" name="token" required>
+                </div>
+                <div class="form-group">
+                    <label for="botClientId">Client ID</label>
+                    <input type="text" id="botClientId" name="clientId" required>
+                </div>
+                <div class="form-group">
+                    <label for="botPrefix">Command Prefix</label>
+                    <input type="text" id="botPrefix" name="prefix" value="!" required>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="botKeepAlive" name="keepAlive" checked>
+                        <span class="checkmark"></span>
+                        Keep Alive
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBotForm">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Bot</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
