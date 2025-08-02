@@ -145,11 +145,19 @@ app.post('/api/bots/:id/ping', (req, res) => {
 
 app.get('/api/servers', (req, res) => {
   const botId = req.query.botId;
+  const guildId = req.query.guildId;
+  
+  let filteredServers = servers;
+  
   if (botId) {
-    res.json(servers.filter(s => s.botId == botId));
-  } else {
-    res.json(servers);
+    filteredServers = filteredServers.filter(s => s.botId == botId);
   }
+  
+  if (guildId) {
+    filteredServers = filteredServers.filter(s => s.guildId === guildId);
+  }
+  
+  res.json(filteredServers);
 });
 
 app.get('/api/servers/:id', (req, res) => {
@@ -262,6 +270,113 @@ app.get('/api/logs', (req, res) => {
   }
   
   res.json(filteredLogs.slice(0, limit));
+});
+
+app.post('/api/logs', (req, res) => {
+  const newLog = {
+    id: activityLogs.length + 1,
+    ...req.body,
+    timestamp: req.body.timestamp || new Date().toISOString()
+  };
+  
+  activityLogs.push(newLog);
+  res.status(201).json(newLog);
+});
+
+// Bot configuration endpoints
+app.patch('/api/bots/:id', (req, res) => {
+  const botIndex = bots.findIndex(b => b.id == req.params.id);
+  if (botIndex === -1) {
+    return res.status(404).json({ error: 'Bot not found' });
+  }
+  
+  bots[botIndex] = {
+    ...bots[botIndex],
+    ...req.body,
+    updatedAt: new Date().toISOString()
+  };
+  
+  // Add activity log for configuration change
+  activityLogs.push({
+    id: activityLogs.length + 1,
+    botId: bots[botIndex].id,
+    serverId: null,
+    action: "Bot Configuration Updated",
+    userId: null,
+    details: { changes: Object.keys(req.body) },
+    timestamp: new Date().toISOString()
+  });
+  
+  res.json(bots[botIndex]);
+});
+
+// Bot control endpoints
+app.post('/api/bots/:id/start', (req, res) => {
+  const botIndex = bots.findIndex(b => b.id == req.params.id);
+  if (botIndex === -1) {
+    return res.status(404).json({ error: 'Bot not found' });
+  }
+  
+  bots[botIndex].status = 'online';
+  bots[botIndex].lastPing = new Date().toISOString();
+  bots[botIndex].updatedAt = new Date().toISOString();
+  
+  activityLogs.push({
+    id: activityLogs.length + 1,
+    botId: bots[botIndex].id,
+    serverId: null,
+    action: "Bot Started",
+    userId: null,
+    details: { status: 'online' },
+    timestamp: new Date().toISOString()
+  });
+  
+  res.json({ success: true, status: 'Bot started successfully' });
+});
+
+app.post('/api/bots/:id/stop', (req, res) => {
+  const botIndex = bots.findIndex(b => b.id == req.params.id);
+  if (botIndex === -1) {
+    return res.status(404).json({ error: 'Bot not found' });
+  }
+  
+  bots[botIndex].status = 'offline';
+  bots[botIndex].updatedAt = new Date().toISOString();
+  
+  activityLogs.push({
+    id: activityLogs.length + 1,
+    botId: bots[botIndex].id,
+    serverId: null,
+    action: "Bot Stopped",
+    userId: null,
+    details: { status: 'offline' },
+    timestamp: new Date().toISOString()
+  });
+  
+  res.json({ success: true, status: 'Bot stopped successfully' });
+});
+
+app.post('/api/bots/:id/restart', (req, res) => {
+  const botIndex = bots.findIndex(b => b.id == req.params.id);
+  if (botIndex === -1) {
+    return res.status(404).json({ error: 'Bot not found' });
+  }
+  
+  bots[botIndex].status = 'online';
+  bots[botIndex].lastPing = new Date().toISOString();
+  bots[botIndex].updatedAt = new Date().toISOString();
+  
+  activityLogs.push({
+    id: activityLogs.length + 1,
+    botId: bots[botIndex].id,
+    serverId: null,
+    action: "Bot Restarted",
+    userId: null,
+    details: { status: 'restarted' },
+    timestamp: new Date().toISOString()
+  });
+  
+  res.json({ success: true, status: 'Bot restarted successfully' });
 });
 
 // Health check endpoint

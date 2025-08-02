@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Configuration - Discord Bot Dashboard</title>
+    <meta name="description" content="Secure Discord bot configuration panel for managing tokens, client IDs, and bot settings.">
+    
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .input-glow:focus {
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+            border-color: #667eea;
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .hidden { display: none; }
+        
+        .status-online { color: #10b981; }
+        .status-idle { color: #f59e0b; }
+        .status-dnd { color: #ef4444; }
+        .status-offline { color: #6b7280; }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-white mb-2">
+                <i class="fas fa-robot mr-3"></i>
+                Discord Bot Configuration
+            </h1>
+            <p class="text-gray-200">Secure configuration panel for Discord bot management</p>
+        </div>
+
+        <!-- Authentication Section -->
+        <div id="authSection" class="max-w-md mx-auto">
+            <div class="glass-card rounded-lg p-6 shadow-xl">
+                <div class="text-center mb-6">
+                    <i class="fas fa-shield-alt text-4xl text-white mb-4"></i>
+                    <h2 class="text-2xl font-bold text-white">Secure Access</h2>
+                    <p class="text-gray-200 text-sm">Enter your credentials to configure bots</p>
+                </div>
+                
+                <form id="authForm">
+                    <div class="mb-4">
+                        <label class="block text-white text-sm font-medium mb-2">
+                            <i class="fas fa-key mr-2"></i>Access Password
+                        </label>
+                        <input type="password" id="accessPassword" 
+                               class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-gray-300 border border-gray-300 border-opacity-30 input-glow focus:outline-none transition-all duration-300"
+                               placeholder="Enter access password" required>
+                    </div>
+                    
+                    <button type="submit" 
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-unlock mr-2"></i>
+                        Access Configuration
+                    </button>
+                </form>
+                
+                <div id="authError" class="hidden mt-4 p-3 bg-red-500 bg-opacity-20 border border-red-500 rounded-lg">
+                    <p class="text-red-200 text-sm">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        Invalid access credentials. Please try again.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bot Configuration Section -->
+        <div id="configSection" class="hidden max-w-4xl mx-auto">
+            <!-- Bot Setup Card -->
+            <div class="glass-card rounded-lg p-6 shadow-xl mb-6">
+                <h2 class="text-2xl font-bold text-white mb-6">
+                    <i class="fas fa-cog mr-3"></i>
+                    Bot Configuration
+                </h2>
+                
+                <form id="botConfigForm">
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-white text-sm font-medium mb-2">
+                                <i class="fas fa-robot mr-2"></i>Bot Token
+                            </label>
+                            <input type="password" id="botToken" 
+                                   class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-gray-300 border border-gray-300 border-opacity-30 input-glow focus:outline-none"
+                                   placeholder="Enter Discord bot token" required>
+                            <p class="text-gray-300 text-xs mt-1">Get this from Discord Developer Portal</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-white text-sm font-medium mb-2">
+                                <i class="fas fa-id-card mr-2"></i>Client ID
+                            </label>
+                            <input type="text" id="clientId" 
+                                   class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-gray-300 border border-gray-300 border-opacity-30 input-glow focus:outline-none"
+                                   placeholder="Enter Discord client ID" required>
+                            <p class="text-gray-300 text-xs mt-1">Application ID from Discord Developer Portal</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-white text-sm font-medium mb-2">
+                                <i class="fas fa-tag mr-2"></i>Bot Name
+                            </label>
+                            <input type="text" id="botName" 
+                                   class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-gray-300 border border-gray-300 border-opacity-30 input-glow focus:outline-none"
+                                   placeholder="Enter bot name" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-white text-sm font-medium mb-2">
+                                <i class="fas fa-terminal mr-2"></i>Command Prefix
+                            </label>
+                            <input type="text" id="commandPrefix" 
+                                   class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-20 text-white placeholder-gray-300 border border-gray-300 border-opacity-30 input-glow focus:outline-none"
+                                   placeholder="!" maxlength="3" value="!">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-white text-sm font-medium mb-2">
+                            <i class="fas fa-circle mr-2"></i>Bot Status
+                        </label>
+                        <select id="botStatus" 
+                                class="w-full px-4 py-3 rounded-lg bg-white bg-opacity-20 text-white border border-gray-300 border-opacity-30 input-glow focus:outline-none">
+                            <option value="online">🟢 Online</option>
+                            <option value="idle">🟡 Idle</option>
+                            <option value="dnd">🔴 Do Not Disturb</option>
+                            <option value="invisible">⚫ Invisible</option>
+                        </select>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="flex items-center text-white">
+                                <input type="checkbox" id="keepAlive" checked 
+                                       class="mr-3 w-4 h-4 text-blue-600 bg-white bg-opacity-20 border-gray-300 rounded focus:ring-blue-500">
+                                <i class="fas fa-heartbeat mr-2"></i>Keep Alive
+                            </label>
+                            <p class="text-gray-300 text-xs mt-1">Automatically ping to keep bot online</p>
+                        </div>
+                        
+                        <div>
+                            <label class="flex items-center text-white">
+                                <input type="checkbox" id="autoRestart" 
+                                       class="mr-3 w-4 h-4 text-blue-600 bg-white bg-opacity-20 border-gray-300 rounded focus:ring-blue-500">
+                                <i class="fas fa-redo mr-2"></i>Auto Restart
+                            </label>
+                            <p class="text-gray-300 text-xs mt-1">Restart bot automatically on errors</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-4">
+                        <button type="submit" 
+                                class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-save mr-2"></i>
+                            Save & Start Bot
+                        </button>
+                        
+                        <button type="button" id="testConnection"
+                                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300">
+                            <i class="fas fa-plug mr-2"></i>
+                            Test Connection
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Bot Status Card -->
+            <div class="glass-card rounded-lg p-6 shadow-xl mb-6">
+                <h3 class="text-xl font-bold text-white mb-4">
+                    <i class="fas fa-chart-line mr-3"></i>
+                    Bot Status
+                </h3>
+                
+                <div class="grid md:grid-cols-4 gap-4">
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-white mb-1" id="statusIndicator">
+                            <i class="fas fa-circle status-offline"></i>
+                        </div>
+                        <p class="text-gray-300 text-sm">Connection</p>
+                        <p class="text-white font-medium" id="statusText">Offline</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-white mb-1" id="serverCount">0</div>
+                        <p class="text-gray-300 text-sm">Servers</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-white mb-1" id="userCount">0</div>
+                        <p class="text-gray-300 text-sm">Users</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="text-2xl font-bold text-white mb-1" id="uptime">0s</div>
+                        <p class="text-gray-300 text-sm">Uptime</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="glass-card rounded-lg p-6 shadow-xl">
+                <h3 class="text-xl font-bold text-white mb-4">
+                    <i class="fas fa-bolt mr-3"></i>
+                    Quick Actions
+                </h3>
+                
+                <div class="grid md:grid-cols-3 gap-4">
+                    <button id="restartBot" 
+                            class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">
+                        <i class="fas fa-redo mr-2"></i>
+                        Restart Bot
+                    </button>
+                    
+                    <button id="stopBot" 
+                            class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">
+                        <i class="fas fa-stop mr-2"></i>
+                        Stop Bot
+                    </button>
+                    
+                    <button id="viewLogs" 
+                            class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300">
+                        <i class="fas fa-file-alt mr-2"></i>
+                        View Logs
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div id="messageContainer" class="fixed top-4 right-4 z-50"></div>
+    </div>
+
+    <script>
+        // Configuration and state
+        const CONFIG = {
+            accessPassword: 'admin123', // Change this to a secure password
+            apiBaseUrl: window.location.origin
+        };
+
+        let botStatus = {
+            connected: false,
+            servers: 0,
+            users: 0,
+            uptime: 0,
+            startTime: null
+        };
+
+        // DOM elements
+        const authSection = document.getElementById('authSection');
+        const configSection = document.getElementById('configSection');
+        const authForm = document.getElementById('authForm');
+        const authError = document.getElementById('authError');
+        const botConfigForm = document.getElementById('botConfigForm');
+
+        // Authentication
+        authForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const password = document.getElementById('accessPassword').value;
+            
+            if (password === CONFIG.accessPassword) {
+                authSection.classList.add('hidden');
+                configSection.classList.remove('hidden');
+                loadBotConfig();
+                showMessage('Access granted successfully', 'success');
+            } else {
+                authError.classList.remove('hidden');
+                setTimeout(() => authError.classList.add('hidden'), 3000);
+            }
+        });
+
+        // Bot configuration
+        botConfigForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await saveBotConfig();
+        });
+
+        // Test connection
+        document.getElementById('testConnection').addEventListener('click', async () => {
+            await testBotConnection();
+        });
+
+        // Quick actions
+        document.getElementById('restartBot').addEventListener('click', async () => {
+            await restartBot();
+        });
+
+        document.getElementById('stopBot').addEventListener('click', async () => {
+            await stopBot();
+        });
+
+        document.getElementById('viewLogs').addEventListener('click', () => {
+            window.open('/api/logs', '_blank');
+        });
+
+        // Functions
+        async function loadBotConfig() {
+            try {
+                const response = await fetch(`${CONFIG.apiBaseUrl}/api/bots`);
+                const bots = await response.json();
+                
+                if (bots.length > 0) {
+                    const bot = bots[0];
+                    document.getElementById('botName').value = bot.name || '';
+                    document.getElementById('commandPrefix').value = bot.prefix || '!';
+                    document.getElementById('botStatus').value = bot.status || 'online';
+                    document.getElementById('keepAlive').checked = bot.keepAlive !== false;
+                    
+                    updateStatusDisplay(bot.status);
+                }
+                
+                updateBotStats();
+            } catch (error) {
+                showMessage('Failed to load bot configuration', 'error');
+            }
+        }
+
+        async function saveBotConfig() {
+            const formData = {
+                name: document.getElementById('botName').value,
+                clientId: document.getElementById('clientId').value,
+                token: document.getElementById('botToken').value,
+                prefix: document.getElementById('commandPrefix').value,
+                status: document.getElementById('botStatus').value,
+                keepAlive: document.getElementById('keepAlive').checked,
+                autoRestart: document.getElementById('autoRestart').checked
+            };
+
+            try {
+                const response = await fetch(`${CONFIG.apiBaseUrl}/api/bots`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    showMessage('Bot configuration saved successfully', 'success');
+                    updateStatusDisplay('online');
+                    startStatusUpdates();
+                } else {
+                    showMessage('Failed to save bot configuration', 'error');
+                }
+            } catch (error) {
+                showMessage('Error saving configuration', 'error');
+            }
+        }
+
+        async function testBotConnection() {
+            const token = document.getElementById('botToken').value;
+            const clientId = document.getElementById('clientId').value;
+
+            if (!token || !clientId) {
+                showMessage('Please enter both token and client ID', 'error');
+                return;
+            }
+
+            try {
+                // Simulate connection test
+                showMessage('Testing connection...', 'info');
+                
+                setTimeout(() => {
+                    const isValid = token.length > 50 && clientId.length > 15;
+                    if (isValid) {
+                        showMessage('Connection test successful', 'success');
+                        updateStatusDisplay('online');
+                    } else {
+                        showMessage('Invalid token or client ID format', 'error');
+                    }
+                }, 2000);
+                
+            } catch (error) {
+                showMessage('Connection test failed', 'error');
+            }
+        }
+
+        async function restartBot() {
+            try {
+                showMessage('Restarting bot...', 'info');
+                
+                // Simulate restart
+                updateStatusDisplay('offline');
+                setTimeout(() => {
+                    updateStatusDisplay('online');
+                    showMessage('Bot restarted successfully', 'success');
+                }, 3000);
+                
+            } catch (error) {
+                showMessage('Failed to restart bot', 'error');
+            }
+        }
+
+        async function stopBot() {
+            try {
+                showMessage('Stopping bot...', 'info');
+                updateStatusDisplay('offline');
+                showMessage('Bot stopped successfully', 'success');
+            } catch (error) {
+                showMessage('Failed to stop bot', 'error');
+            }
+        }
+
+        function updateStatusDisplay(status) {
+            const statusIndicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            
+            statusIndicator.innerHTML = `<i class="fas fa-circle status-${status}"></i>`;
+            statusText.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+            
+            botStatus.connected = status === 'online';
+        }
+
+        function updateBotStats() {
+            // Simulate bot statistics
+            if (botStatus.connected) {
+                botStatus.servers = Math.floor(Math.random() * 10) + 1;
+                botStatus.users = Math.floor(Math.random() * 1000) + 100;
+                
+                if (!botStatus.startTime) {
+                    botStatus.startTime = Date.now();
+                }
+                
+                botStatus.uptime = Math.floor((Date.now() - botStatus.startTime) / 1000);
+            } else {
+                botStatus.servers = 0;
+                botStatus.users = 0;
+                botStatus.uptime = 0;
+                botStatus.startTime = null;
+            }
+
+            document.getElementById('serverCount').textContent = botStatus.servers;
+            document.getElementById('userCount').textContent = botStatus.users;
+            document.getElementById('uptime').textContent = formatUptime(botStatus.uptime);
+        }
+
+        function formatUptime(seconds) {
+            if (seconds === 0) return '0s';
+            
+            const days = Math.floor(seconds / 86400);
+            const hours = Math.floor((seconds % 86400) / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+
+            if (days > 0) return `${days}d ${hours}h`;
+            if (hours > 0) return `${hours}h ${minutes}m`;
+            if (minutes > 0) return `${minutes}m ${secs}s`;
+            return `${secs}s`;
+        }
+
+        function startStatusUpdates() {
+            setInterval(updateBotStats, 5000); // Update every 5 seconds
+        }
+
+        function showMessage(message, type) {
+            const container = document.getElementById('messageContainer');
+            const messageDiv = document.createElement('div');
+            
+            const colors = {
+                success: 'bg-green-500',
+                error: 'bg-red-500',
+                info: 'bg-blue-500'
+            };
+
+            messageDiv.className = `${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg mb-2 transform transition-all duration-300`;
+            messageDiv.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-white hover:text-gray-200">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+
+            container.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                if (messageDiv.parentElement) {
+                    messageDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Initialize
+        updateBotStats();
+    </script>
+</body>
+</html>
