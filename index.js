@@ -31,7 +31,7 @@ let bots = [
 let servers = [
   {
     id: 1,
-    guildId: "987654321098765432",
+    guildId: "1370394626476867696",
     name: "Demo Server",
     botId: 1,
     isActive: true,
