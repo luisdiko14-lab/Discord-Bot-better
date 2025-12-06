@@ -391,9 +391,9 @@ app.get('/health', (req, res) => {
 // System Info endpoint - simulated hardware specs
 app.get('/api/system-info', (req, res) => {
   const uptime = process.uptime();
-  const baseRamUsage = 4.2;
-  const ramVariation = Math.sin(Date.now() / 10000) * 1.5;
-  const ramUsed = Math.max(3.5, Math.min(8.5, baseRamUsage + ramVariation + Math.random() * 2));
+  const baseRamUsage = 120;
+  const ramVariation = Math.sin(Date.now() / 10000) * 30;
+  const ramUsed = Math.max(80, Math.min(280, baseRamUsage + ramVariation + Math.random() * 50));
   
   const baseCpuUsage = 12;
   const cpuVariation = Math.sin(Date.now() / 5000) * 8;
@@ -402,15 +402,15 @@ app.get('/api/system-info', (req, res) => {
   res.json({
     cpu: {
       model: "AMD Ryzen 7 7800X3D",
-      cores: 32,
+      cores: 126,
       usage: parseFloat(cpuUsage.toFixed(1)),
       temperature: parseFloat((45 + Math.random() * 15).toFixed(1))
     },
     ram: {
-      total: 18,
+      total: 528,
       used: parseFloat(ramUsed.toFixed(2)),
-      free: parseFloat((18 - ramUsed).toFixed(2)),
-      usagePercent: parseFloat(((ramUsed / 18) * 100).toFixed(1))
+      free: parseFloat((528 - ramUsed).toFixed(2)),
+      usagePercent: parseFloat(((ramUsed / 528) * 100).toFixed(1))
     },
     uptime: {
       seconds: Math.floor(uptime),

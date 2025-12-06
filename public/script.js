@@ -1,3 +1,4 @@
+alert("You have been rewarded with premium")
 // Discord Bot Dashboard Script
 class BotDashboard {
     constructor() {
