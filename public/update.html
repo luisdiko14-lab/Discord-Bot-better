@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Updating Dashboard...</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+        }
+
+        .update-container {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .logo {
+            font-size: 64px;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #5865F2, #57F287);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-text {
+            font-size: 16px;
+            color: #a0aec0;
+            margin-bottom: 30px;
+        }
+
+        .progress-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #5865F2, #57F287, #5865F2);
+            background-size: 200% 100%;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.3s ease;
+            animation: shimmer 2s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .progress-text {
+            font-size: 14px;
+            color: #57F287;
+            font-weight: 600;
+        }
+
+        .update-steps {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background: rgba(88, 101, 242, 0.2);
+            border-left: 3px solid #5865F2;
+        }
+
+        .step.completed {
+            background: rgba(87, 242, 135, 0.1);
+            border-left: 3px solid #57F287;
+        }
+
+        .step-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .step.completed .step-icon {
+            background: #57F287;
+            color: #1a1a2e;
+        }
+
+        .step.active .step-icon {
+            background: #5865F2;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .step-text {
+            font-size: 14px;
+            color: #a0aec0;
+        }
+
+        .step.active .step-text,
+        .step.completed .step-text {
+            color: #ffffff;
+        }
+
+        .footer-text {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="update-container">
+        <div class="logo">🤖</div>
+        <h1>Updating Dashboard</h1>
+        <p class="status-text" id="statusText">Preparing update...</p>
+        
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <p class="progress-text"><span id="progressPercent">0</span>%</p>
+
+        <div class="update-steps">
+            <div class="step" id="step1">
+                <div class="step-icon">1</div>
+                <span class="step-text">Checking for updates</span>
+            </div>
+            <div class="step" id="step2">
+                <div class="step-icon">2</div>
+                <span class="step-text">Downloading latest version</span>
+            </div>
+            <div class="step" id="step3">
+                <div class="step-icon">3</div>
+                <span class="step-text">Installing updates</span>
+            </div>
+            <div class="step" id="step4">
+                <div class="step-icon">4</div>
+                <span class="step-text">Restarting dashboard</span>
+            </div>
+        </div>
+
+        <p class="footer-text">Please do not close this window</p>
+    </div>
+
+    <script>
+        const steps = [
+            { id: 'step1', text: 'Checking for updates...', duration: 1500 },
+            { id: 'step2', text: 'Downloading latest version...', duration: 2500 },
+            { id: 'step3', text: 'Installing updates...', duration: 2000 },
+            { id: 'step4', text: 'Restarting dashboard...', duration: 1500 }
+        ];
+
+        const progressBar = document.getElementById('progressBar');
+        const progressPercent = document.getElementById('progressPercent');
+        const statusText = document.getElementById('statusText');
+
+        let currentProgress = 0;
+        let currentStep = 0;
+
+        function updateProgress(target) {
+            const interval = setInterval(() => {
+                if (currentProgress < target) {
+                    currentProgress++;
+                    progressBar.style.width = currentProgress + '%';
+                    progressPercent.textContent = currentProgress;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 30);
+        }
+
+        function activateStep(stepIndex) {
+            if (stepIndex > 0) {
+                const prevStep = document.getElementById(steps[stepIndex - 1].id);
+                prevStep.classList.remove('active');
+                prevStep.classList.add('completed');
+                prevStep.querySelector('.step-icon').innerHTML = '✓';
+            }
+
+            if (stepIndex < steps.length) {
+                const step = document.getElementById(steps[stepIndex].id);
+                step.classList.add('active');
+                step.querySelector('.step-icon').innerHTML = '⟳';
+                statusText.textContent = steps[stepIndex].text;
+            }
+        }
+
+        async function runUpdate() {
+            for (let i = 0; i < steps.length; i++) {
+                activateStep(i);
+                const targetProgress = Math.floor((i + 1) * (100 / steps.length));
+                updateProgress(targetProgress);
+                await new Promise(resolve => setTimeout(resolve, steps[i].duration));
+            }
+
+            const lastStep = document.getElementById(steps[steps.length - 1].id);
+            lastStep.classList.remove('active');
+            lastStep.classList.add('completed');
+            lastStep.querySelector('.step-icon').innerHTML = '✓';
+
+            statusText.textContent = 'Update complete! Redirecting...';
+            
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            window.location.href = '/';
+        }
+
+        runUpdate();
+    </script>
+</body>
+</html>

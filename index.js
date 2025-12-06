@@ -391,12 +391,12 @@ app.get('/health', (req, res) => {
 // System Info endpoint - simulated hardware specs
 app.get('/api/system-info', (req, res) => {
   const uptime = process.uptime();
-  const baseRamUsage = 120;
+  const baseRamUsage = 528;
   const ramVariation = Math.sin(Date.now() / 10000) * 30;
   const ramUsed = Math.max(80, Math.min(280, baseRamUsage + ramVariation + Math.random() * 50));
   
-  const baseCpuUsage = 12;
-  const cpuVariation = Math.sin(Date.now() / 5000) * 8;
+  const baseCpuUsage = 120;
+  const cpuVariation = Math.sin(Date.now() / 12000) * 8;
   const cpuUsage = Math.max(5, Math.min(45, baseCpuUsage + cpuVariation + Math.random() * 10));
   
   res.json({
