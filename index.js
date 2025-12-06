@@ -388,6 +388,99 @@ app.get('/health', (req, res) => {
   });
 });
 
+// System Info endpoint - simulated hardware specs
+app.get('/api/system-info', (req, res) => {
+  const uptime = process.uptime();
+  const baseRamUsage = 4.2;
+  const ramVariation = Math.sin(Date.now() / 10000) * 1.5;
+  const ramUsed = Math.max(3.5, Math.min(8.5, baseRamUsage + ramVariation + Math.random() * 2));
+  
+  const baseCpuUsage = 12;
+  const cpuVariation = Math.sin(Date.now() / 5000) * 8;
+  const cpuUsage = Math.max(5, Math.min(45, baseCpuUsage + cpuVariation + Math.random() * 10));
+  
+  res.json({
+    cpu: {
+      model: "AMD Ryzen 7 7800X3D",
+      cores: 32,
+      usage: parseFloat(cpuUsage.toFixed(1)),
+      temperature: parseFloat((45 + Math.random() * 15).toFixed(1))
+    },
+    ram: {
+      total: 18,
+      used: parseFloat(ramUsed.toFixed(2)),
+      free: parseFloat((18 - ramUsed).toFixed(2)),
+      usagePercent: parseFloat(((ramUsed / 18) * 100).toFixed(1))
+    },
+    uptime: {
+      seconds: Math.floor(uptime),
+      formatted: formatUptime(uptime)
+    },
+    status: 'healthy'
+  });
+});
+
+function formatUptime(seconds) {
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
+  
+  if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+  if (hours > 0) return `${hours}h ${minutes}m ${secs}s`;
+  if (minutes > 0) return `${minutes}m ${secs}s`;
+  return `${secs}s`;
+}
+
+// Delete server endpoint
+app.delete('/api/servers/:id', (req, res) => {
+  const serverIndex = servers.findIndex(s => s.id == req.params.id);
+  if (serverIndex === -1) {
+    return res.status(404).json({ error: 'Server not found' });
+  }
+  
+  const deletedServer = servers[serverIndex];
+  servers.splice(serverIndex, 1);
+  
+  activityLogs.push({
+    id: activityLogs.length + 1,
+    botId: deletedServer.botId,
+    serverId: null,
+    action: "Server Removed",
+    userId: null,
+    details: { name: deletedServer.name },
+    timestamp: new Date().toISOString()
+  });
+  
+  res.status(204).send();
+});
+
+// Update server endpoint
+app.patch('/api/servers/:id', (req, res) => {
+  const serverIndex = servers.findIndex(s => s.id == req.params.id);
+  if (serverIndex === -1) {
+    return res.status(404).json({ error: 'Server not found' });
+  }
+  
+  servers[serverIndex] = {
+    ...servers[serverIndex],
+    ...req.body,
+    updatedAt: new Date().toISOString()
+  };
+  
+  activityLogs.push({
+    id: activityLogs.length + 1,
+    botId: servers[serverIndex].botId,
+    serverId: servers[serverIndex].id,
+    action: "Server Updated",
+    userId: null,
+    details: { name: servers[serverIndex].name, changes: Object.keys(req.body) },
+    timestamp: new Date().toISOString()
+  });
+  
+  res.json(servers[serverIndex]);
+});
+
 // Keep-alive endpoint for bot pinging
 app.post('/ping', (req, res) => {
   console.log('Keep-alive ping received at', new Date().toISOString());

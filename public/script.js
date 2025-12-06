@@ -16,6 +16,7 @@ class BotDashboard {
         this.connectWebSocket();
         this.loadInitialData();
         this.startKeepAlive();
+        this.startSystemInfoPolling();
     }
 
     setupTheme() {
@@ -84,6 +85,30 @@ class BotDashboard {
         document.getElementById('botModal').addEventListener('click', (e) => {
             if (e.target.id === 'botModal') {
                 this.hideBotModal();
+            }
+        });
+
+        // Server modal controls
+        document.getElementById('addServerBtn').addEventListener('click', () => {
+            this.showServerModal();
+        });
+
+        document.getElementById('closeServerModal').addEventListener('click', () => {
+            this.hideServerModal();
+        });
+
+        document.getElementById('cancelServerForm').addEventListener('click', () => {
+            this.hideServerModal();
+        });
+
+        document.getElementById('serverForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.handleServerSubmission();
+        });
+
+        document.getElementById('serverModal').addEventListener('click', (e) => {
+            if (e.target.id === 'serverModal') {
+                this.hideServerModal();
             }
         });
     }
@@ -330,13 +355,17 @@ class BotDashboard {
                     <i class="fas fa-server"></i>
                     <h3>No Servers Found</h3>
                     <p>Connect your bot to Discord servers to manage them here.</p>
+                    <button class="btn btn-primary" onclick="dashboard.showServerModal()" data-testid="button-add-server-empty">
+                        <i class="fas fa-plus"></i>
+                        Add Server
+                    </button>
                 </div>
             `;
             return;
         }
 
         container.innerHTML = this.servers.map(server => `
-            <div class="server-card">
+            <div class="server-card" data-testid="card-server-${server.id}">
                 <div class="card-title">
                     <i class="fas fa-server"></i>
                     ${this.escapeHtml(server.name)}
@@ -349,13 +378,193 @@ class BotDashboard {
                     <p><strong>Anti-Nuke:</strong> ${server.settings?.antiNukeEnabled ? 'Enabled' : 'Disabled'}</p>
                 </div>
                 <div class="card-actions">
-                    <button class="btn btn-sm" onclick="dashboard.configureServer(${server.id})">
+                    <button class="btn btn-sm" onclick="dashboard.configureServer(${server.id})" data-testid="button-configure-server-${server.id}">
                         <i class="fas fa-cog"></i>
                         Configure
+                    </button>
+                    <button class="btn btn-sm" onclick="dashboard.editServer(${server.id})" data-testid="button-edit-server-${server.id}">
+                        <i class="fas fa-edit"></i>
+                        Edit
+                    </button>
+                    <button class="btn btn-sm btn-destructive" onclick="dashboard.deleteServer(${server.id})" data-testid="button-delete-server-${server.id}">
+                        <i class="fas fa-trash"></i>
+                        Delete
                     </button>
                 </div>
             </div>
         `).join('');
+    }
+
+    showServerModal(server = null) {
+        const modal = document.getElementById('serverModal');
+        const title = document.getElementById('serverModalTitle');
+        const form = document.getElementById('serverForm');
+        
+        // Populate bot select
+        const botSelect = document.getElementById('serverBotId');
+        botSelect.innerHTML = '<option value="">Select a bot...</option>';
+        this.bots.forEach(bot => {
+            const option = document.createElement('option');
+            option.value = bot.id;
+            option.textContent = bot.name;
+            botSelect.appendChild(option);
+        });
+        
+        if (server) {
+            title.textContent = 'Edit Server';
+            form.elements.name.value = server.name;
+            form.elements.guildId.value = server.guildId;
+            form.elements.botId.value = server.botId;
+            form.elements.isActive.checked = server.isActive;
+            form.elements.moderationEnabled.checked = server.settings?.moderationEnabled ?? true;
+            form.elements.musicEnabled.checked = server.settings?.musicEnabled ?? true;
+            form.elements.antiNukeEnabled.checked = server.settings?.antiNukeEnabled ?? true;
+            form.dataset.editId = server.id;
+        } else {
+            title.textContent = 'Add Server';
+            form.reset();
+            form.elements.isActive.checked = true;
+            form.elements.moderationEnabled.checked = true;
+            form.elements.musicEnabled.checked = true;
+            form.elements.antiNukeEnabled.checked = true;
+            delete form.dataset.editId;
+        }
+        
+        modal.classList.add('show');
+    }
+
+    hideServerModal() {
+        const modal = document.getElementById('serverModal');
+        modal.classList.remove('show');
+    }
+
+    async handleServerSubmission() {
+        const form = document.getElementById('serverForm');
+        const formData = new FormData(form);
+        
+        const serverData = {
+            name: formData.get('name'),
+            guildId: formData.get('guildId'),
+            botId: parseInt(formData.get('botId')),
+            isActive: formData.has('isActive'),
+            settings: {
+                moderationEnabled: formData.has('moderationEnabled'),
+                musicEnabled: formData.has('musicEnabled'),
+                antiNukeEnabled: formData.has('antiNukeEnabled')
+            }
+        };
+
+        try {
+            const isEdit = form.dataset.editId;
+            const url = isEdit ? `/api/servers/${form.dataset.editId}` : '/api/servers';
+            const method = isEdit ? 'PATCH' : 'POST';
+            
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(serverData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to ${isEdit ? 'update' : 'create'} server`);
+            }
+
+            const server = await response.json();
+            
+            if (isEdit) {
+                const index = this.servers.findIndex(s => s.id == form.dataset.editId);
+                if (index !== -1) {
+                    this.servers[index] = server;
+                }
+            } else {
+                this.servers.push(server);
+            }
+
+            this.renderServers();
+            this.populateServerSelects();
+            this.hideServerModal();
+            this.showSuccess(`Server ${isEdit ? 'updated' : 'created'} successfully`);
+            this.addActivity('Server Management', `Server ${server.name} ${isEdit ? 'updated' : 'created'}`);
+
+        } catch (error) {
+            console.error('Error saving server:', error);
+            this.showError(error.message);
+        }
+    }
+
+    async editServer(serverId) {
+        const server = this.servers.find(s => s.id === serverId);
+        if (server) {
+            this.showServerModal(server);
+        }
+    }
+
+    async deleteServer(serverId) {
+        if (!confirm('Are you sure you want to delete this server? This action cannot be undone.')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/servers/${serverId}`, {
+                method: 'DELETE'
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete server');
+            }
+
+            this.servers = this.servers.filter(server => server.id !== serverId);
+            this.renderServers();
+            this.populateServerSelects();
+            this.showSuccess('Server deleted successfully');
+            this.addActivity('Server Management', 'Server deleted');
+
+        } catch (error) {
+            console.error('Error deleting server:', error);
+            this.showError('Failed to delete server');
+        }
+    }
+
+    configureServer(serverId) {
+        this.currentServerId = serverId;
+        const server = this.servers.find(s => s.id === serverId);
+        if (server) {
+            this.showSuccess(`Configuring server: ${server.name}`);
+        }
+    }
+
+    startSystemInfoPolling() {
+        this.loadSystemInfo();
+        setInterval(() => this.loadSystemInfo(), 5000);
+    }
+
+    async loadSystemInfo() {
+        try {
+            const response = await fetch('/api/system-info');
+            if (!response.ok) throw new Error('Failed to fetch system info');
+            
+            const info = await response.json();
+            this.updateSystemInfo(info);
+        } catch (error) {
+            console.error('Error loading system info:', error);
+        }
+    }
+
+    updateSystemInfo(info) {
+        document.getElementById('cpuModel').textContent = info.cpu.model;
+        document.getElementById('cpuCores').textContent = `${info.cpu.cores} Cores`;
+        document.getElementById('ramTotal').textContent = `${info.ram.total} GB`;
+        
+        document.getElementById('cpuUsagePercent').textContent = `${info.cpu.usage}%`;
+        document.getElementById('cpuUsageBar').style.width = `${info.cpu.usage}%`;
+        
+        document.getElementById('ramUsagePercent').textContent = `${info.ram.usagePercent}%`;
+        document.getElementById('ramUsageBar').style.width = `${info.ram.usagePercent}%`;
+        document.getElementById('ramDetails').textContent = `${info.ram.used} / ${info.ram.total} GB`;
+        
+        document.getElementById('systemUptime').textContent = info.uptime.formatted;
     }
 
     populateServerSelects() {

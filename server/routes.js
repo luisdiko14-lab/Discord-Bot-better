@@ -85,7 +85,7 @@ router.post("/api/bots/:id/ping", async (req, res) => {
 // Server routes
 router.get("/api/servers", async (req, res) => {
   try {
-    const botId = req.query.botId ? parseInt(req.query.botId as string) : undefined;
+    const botId = req.query.botId ? parseInt(String(req.query.botId)) : undefined;
     const servers = botId 
       ? await storage.getServersByBot(botId)
       : await storage.getServers();
@@ -292,9 +292,9 @@ router.patch("/api/commands/:id", async (req, res) => {
 // Activity logs routes
 router.get("/api/logs", async (req, res) => {
   try {
-    const botId = req.query.botId ? parseInt(req.query.botId as string) : undefined;
-    const serverId = req.query.serverId ? parseInt(req.query.serverId as string) : undefined;
-    const limit = req.query.limit ? parseInt(req.query.limit as string) : 100;
+    const botId = req.query.botId ? parseInt(String(req.query.botId)) : undefined;
+    const serverId = req.query.serverId ? parseInt(String(req.query.serverId)) : undefined;
+    const limit = req.query.limit ? parseInt(String(req.query.limit)) : 100;
     
     const logs = await storage.getActivityLogs(botId, serverId, limit);
     res.json(logs);
