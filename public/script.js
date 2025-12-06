@@ -1,4 +1,5 @@
 alert("You have been rewarded with premium")
+alert("Please remix https://replit.com/@ntikochastrit/DiscordGuard and run the webpage if it doesn't work")
 // Discord Bot Dashboard Script
 class BotDashboard {
     constructor() {
