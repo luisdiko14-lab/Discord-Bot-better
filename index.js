@@ -393,7 +393,7 @@ app.get('/api/system-info', (req, res) => {
   const uptime = process.uptime();
   const baseRamUsage = 25;
   const ramVariation = Math.sin(Date.now() / 1000) * 30;
-  const ramUsed = Math.max(800, Math.min(2480, baseRamUsage + ramVariation + Math.random() * 50));
+  const ramUsed = Math.max(27, Math.min(528, baseRamUsage + ramVariation + Math.random() * 50));
   
   const baseCpuUsage = 120;
   const cpuVariation = Math.sin(Date.now() / 180) *8;
