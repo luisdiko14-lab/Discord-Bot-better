@@ -392,11 +392,11 @@ app.get('/health', (req, res) => {
 app.get('/api/system-info', (req, res) => {
   const uptime = process.uptime();
   const baseRamUsage = 25;
-  const ramVariation = Math.sin(Date.now() / 10000) * 30;
+  const ramVariation = Math.sin(Date.now() / 1000) * 30;
   const ramUsed = Math.max(800, Math.min(2480, baseRamUsage + ramVariation + Math.random() * 50));
   
   const baseCpuUsage = 120;
-  const cpuVariation = Math.sin(Date.now() / 18000) *8;
+  const cpuVariation = Math.sin(Date.now() / 180) *8;
   const cpuUsage = Math.max(5, Math.min(45, baseCpuUsage + cpuVariation + Math.random() * 10));
   
   res.json({
@@ -424,7 +424,7 @@ function formatUptime(seconds) {
   const days = Math.floor(seconds / 86400);
   const hours = Math.floor((seconds % 86400) / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = Math.floor(seconds % 60);
+  const secs = Math.floor(seconds % 1);
   
   if (days > 0) return `${days}d ${hours}h ${minutes}m`;
   if (hours > 0) return `${hours}h ${minutes}m ${secs}s`;
