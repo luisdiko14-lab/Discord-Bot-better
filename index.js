@@ -79,7 +79,7 @@ app.post('/api/bots', (req, res) => {
     updatedAt: new Date().toISOString()
   };
   bots.push(newBot);
-  
+
   // Add activity log
   activityLogs.push({
     id: activityLogs.length + 1,
@@ -90,7 +90,7 @@ app.post('/api/bots', (req, res) => {
     details: { name: newBot.name },
     timestamp: new Date().toISOString()
   });
-  
+
   res.status(201).json(newBot);
 });
 
@@ -99,13 +99,13 @@ app.patch('/api/bots/:id', (req, res) => {
   if (botIndex === -1) {
     return res.status(404).json({ error: 'Bot not found' });
   }
-  
+
   bots[botIndex] = {
     ...bots[botIndex],
     ...req.body,
     updatedAt: new Date().toISOString()
   };
-  
+
   res.json(bots[botIndex]);
 });
 
@@ -114,7 +114,7 @@ app.delete('/api/bots/:id', (req, res) => {
   if (botIndex === -1) {
     return res.status(404).json({ error: 'Bot not found' });
   }
-  
+
   bots.splice(botIndex, 1);
   res.status(204).send();
 });
@@ -124,11 +124,11 @@ app.post('/api/bots/:id/ping', (req, res) => {
   if (botIndex === -1) {
     return res.status(404).json({ error: 'Bot not found' });
   }
-  
+
   bots[botIndex].status = req.body.status || 'online';
   bots[botIndex].lastPing = new Date().toISOString();
   bots[botIndex].updatedAt = new Date().toISOString();
-  
+
   // Add activity log
   activityLogs.push({
     id: activityLogs.length + 1,
@@ -139,24 +139,24 @@ app.post('/api/bots/:id/ping', (req, res) => {
     details: { status: bots[botIndex].status },
     timestamp: new Date().toISOString()
   });
-  
+
   res.json({ success: true });
 });
 
 app.get('/api/servers', (req, res) => {
   const botId = req.query.botId;
   const guildId = req.query.guildId;
-  
+
   let filteredServers = servers;
-  
+
   if (botId) {
     filteredServers = filteredServers.filter(s => s.botId == botId);
   }
-  
+
   if (guildId) {
     filteredServers = filteredServers.filter(s => s.guildId === guildId);
   }
-  
+
   res.json(filteredServers);
 });
 
@@ -258,17 +258,17 @@ app.get('/api/logs', (req, res) => {
   const limit = parseInt(req.query.limit) || 100;
   const botId = req.query.botId;
   const serverId = req.query.serverId;
-  
+
   let filteredLogs = activityLogs;
-  
+
   if (botId) {
     filteredLogs = filteredLogs.filter(log => log.botId == botId);
   }
-  
+
   if (serverId) {
     filteredLogs = filteredLogs.filter(log => log.serverId == serverId);
   }
-  
+
   res.json(filteredLogs.slice(0, limit));
 });
 
@@ -278,7 +278,7 @@ app.post('/api/logs', (req, res) => {
     ...req.body,
     timestamp: req.body.timestamp || new Date().toISOString()
   };
-  
+
   activityLogs.push(newLog);
   res.status(201).json(newLog);
 });
@@ -289,13 +289,13 @@ app.patch('/api/bots/:id', (req, res) => {
   if (botIndex === -1) {
     return res.status(404).json({ error: 'Bot not found' });
   }
-  
+
   bots[botIndex] = {
     ...bots[botIndex],
     ...req.body,
     updatedAt: new Date().toISOString()
   };
-  
+
   // Add activity log for configuration change
   activityLogs.push({
     id: activityLogs.length + 1,
@@ -306,7 +306,7 @@ app.patch('/api/bots/:id', (req, res) => {
     details: { changes: Object.keys(req.body) },
     timestamp: new Date().toISOString()
   });
-  
+
   res.json(bots[botIndex]);
 });
 
@@ -316,11 +316,11 @@ app.post('/api/bots/:id/start', (req, res) => {
   if (botIndex === -1) {
     return res.status(404).json({ error: 'Bot not found' });
   }
-  
+
   bots[botIndex].status = 'online';
   bots[botIndex].lastPing = new Date().toISOString();
   bots[botIndex].updatedAt = new Date().toISOString();
-  
+
   activityLogs.push({
     id: activityLogs.length + 1,
     botId: bots[botIndex].id,
@@ -330,7 +330,7 @@ app.post('/api/bots/:id/start', (req, res) => {
     details: { status: 'online' },
     timestamp: new Date().toISOString()
   });
-  
+
   res.json({ success: true, status: 'Bot started successfully' });
 });
 
@@ -339,10 +339,10 @@ app.post('/api/bots/:id/stop', (req, res) => {
   if (botIndex === -1) {
     return res.status(404).json({ error: 'Bot not found' });
   }
-  
+
   bots[botIndex].status = 'offline';
   bots[botIndex].updatedAt = new Date().toISOString();
-  
+
   activityLogs.push({
     id: activityLogs.length + 1,
     botId: bots[botIndex].id,
@@ -352,7 +352,7 @@ app.post('/api/bots/:id/stop', (req, res) => {
     details: { status: 'offline' },
     timestamp: new Date().toISOString()
   });
-  
+
   res.json({ success: true, status: 'Bot stopped successfully' });
 });
 
@@ -361,11 +361,11 @@ app.post('/api/bots/:id/restart', (req, res) => {
   if (botIndex === -1) {
     return res.status(404).json({ error: 'Bot not found' });
   }
-  
+
   bots[botIndex].status = 'online';
   bots[botIndex].lastPing = new Date().toISOString();
   bots[botIndex].updatedAt = new Date().toISOString();
-  
+
   activityLogs.push({
     id: activityLogs.length + 1,
     botId: bots[botIndex].id,
@@ -375,7 +375,7 @@ app.post('/api/bots/:id/restart', (req, res) => {
     details: { status: 'restarted' },
     timestamp: new Date().toISOString()
   });
-  
+
   res.json({ success: true, status: 'Bot restarted successfully' });
 });
 
@@ -391,14 +391,14 @@ app.get('/health', (req, res) => {
 // System Info endpoint - simulated hardware specs
 app.get('/api/system-info', (req, res) => {
   const uptime = process.uptime();
-  const baseRamUsage = 25;
-  const ramVariation = Math.sin(Date.now() / 1000) * 30;
-  const ramUsed = Math.max(27, Math.min(528, baseRamUsage + ramVariation + Math.random() * 50));
-  
+  const baseRamUsage = 528;
+  const ramVariation = Math.sin(Date.now() / 10000) * 30;
+  const ramUsed = Math.max(80, Math.min(280, baseRamUsage + ramVariation + Math.random() * 50));
+
   const baseCpuUsage = 120;
-  const cpuVariation = Math.sin(Date.now() / 180) *8;
+  const cpuVariation = Math.sin(Date.now() / 12000) * 8;
   const cpuUsage = Math.max(5, Math.min(45, baseCpuUsage + cpuVariation + Math.random() * 10));
-  
+
   res.json({
     cpu: {
       model: "AMD Ryzen 7 7800X3D",
@@ -424,8 +424,8 @@ function formatUptime(seconds) {
   const days = Math.floor(seconds / 86400);
   const hours = Math.floor((seconds % 86400) / 3600);
   const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = Math.floor(seconds % 1);
-  
+  const secs = Math.floor(seconds % 60);
+
   if (days > 0) return `${days}d ${hours}h ${minutes}m`;
   if (hours > 0) return `${hours}h ${minutes}m ${secs}s`;
   if (minutes > 0) return `${minutes}m ${secs}s`;
@@ -438,10 +438,10 @@ app.delete('/api/servers/:id', (req, res) => {
   if (serverIndex === -1) {
     return res.status(404).json({ error: 'Server not found' });
   }
-  
+
   const deletedServer = servers[serverIndex];
   servers.splice(serverIndex, 1);
-  
+
   activityLogs.push({
     id: activityLogs.length + 1,
     botId: deletedServer.botId,
@@ -451,7 +451,7 @@ app.delete('/api/servers/:id', (req, res) => {
     details: { name: deletedServer.name },
     timestamp: new Date().toISOString()
   });
-  
+
   res.status(204).send();
 });
 
@@ -461,13 +461,13 @@ app.patch('/api/servers/:id', (req, res) => {
   if (serverIndex === -1) {
     return res.status(404).json({ error: 'Server not found' });
   }
-  
+
   servers[serverIndex] = {
     ...servers[serverIndex],
     ...req.body,
     updatedAt: new Date().toISOString()
   };
-  
+
   activityLogs.push({
     id: activityLogs.length + 1,
     botId: servers[serverIndex].botId,
@@ -477,14 +477,14 @@ app.patch('/api/servers/:id', (req, res) => {
     details: { name: servers[serverIndex].name, changes: Object.keys(req.body) },
     timestamp: new Date().toISOString()
   });
-  
+
   res.json(servers[serverIndex]);
 });
 
 // Keep-alive endpoint for bot pinging
 app.post('/ping', (req, res) => {
   console.log('Keep-alive ping received at', new Date().toISOString());
-  
+
   // Add activity log
   activityLogs.push({
     id: activityLogs.length + 1,
@@ -495,7 +495,7 @@ app.post('/ping', (req, res) => {
     details: { source: req.body.source || 'unknown' },
     timestamp: new Date().toISOString()
   });
-  
+
   res.json({ 
     status: 'alive', 
     timestamp: new Date().toISOString() 
@@ -510,7 +510,7 @@ const wss = new WebSocketServer({ server, path: '/ws' });
 
 wss.on('connection', (ws) => {
   console.log('WebSocket client connected');
-  
+
   // Send welcome message
   ws.send(JSON.stringify({
     type: 'connected',
@@ -523,7 +523,7 @@ wss.on('connection', (ws) => {
     try {
       const data = JSON.parse(message.toString());
       console.log('Received WebSocket message:', data);
-      
+
       // Echo back for now - in real implementation, this would handle bot commands
       if (ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({
@@ -561,7 +561,7 @@ function broadcast(data) {
 // Keep-alive functionality
 setInterval(() => {
   console.log(`Bot Dashboard is alive - ${new Date().toISOString()}`);
-  
+
   // Update bot status randomly for demo
   if (bots.length > 0) {
     const randomBot = bots[Math.floor(Math.random() * bots.length)];
@@ -569,7 +569,7 @@ setInterval(() => {
     randomBot.status = statuses[Math.floor(Math.random() * statuses.length)];
     randomBot.lastPing = new Date().toISOString();
   }
-  
+
   // Broadcast heartbeat to connected clients
   broadcast({
     type: 'heartbeat',
