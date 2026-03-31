@@ -1,6 +1,6 @@
 modules = ["nodejs-20"]
 [agent]
-integrations = ["javascript_database==1.0.0"]
+integrations = ["javascript_database:1.0.0"]
 
 [nix]
 channel = "stable-25_05"
@@ -8,8 +8,40 @@ packages = ["sish"]
 
 [[ports]]
 localPort = 3000
-externalPort = 80
+externalPort = 3000
 
 [[ports]]
 localPort = 5000
-externalPort = 5000
+externalPort = 80
+
+[workflows]
+
+[[workflows.workflow]]
+name = "Run bot"
+mode = "sequential"
+author = 50866297
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "chmod +x start.sh && ./start.sh"
+
+[[workflows.workflow]]
+name = "Simple Server Run"
+mode = "sequential"
+author = 50866297
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node simple_server.js"
+
+[[workflows.workflow]]
+name = "Run setup database!"
+mode = "sequential"
+author = 50866297
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node setup_database.mjs"
