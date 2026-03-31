@@ -8,9 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-
     "server": "node setup_database.mjs && node index.js",
-
     "dev:full": "concurrently \"vite\" \"node index.js\""
   },
   "keywords": [],
