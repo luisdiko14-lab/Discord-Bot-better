@@ -1,4 +1,8 @@
-import { Pool } from '@neondatabase/serverless';
+import { neonConfig, Pool } from '@neondatabase/serverless';
+import ws from 'ws';
+
+// ✅ Fix: provide WebSocket implementation for Node.js
+neonConfig.webSocketConstructor = ws;
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL must be set");
@@ -8,17 +12,17 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 async function setupDatabase() {
   const client = await pool.connect();
-  
+
   try {
     console.log('Setting up database tables...');
-    
+
     // Create tables
     await client.query(`
       CREATE TABLE IF NOT EXISTS bots (
         id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
         token TEXT NOT NULL,
-        client_id TEXT NOT NULL,
+        client_id TEXT NOT NULL UNIQUE,
         status TEXT NOT NULL DEFAULT 'offline',
         prefix TEXT NOT NULL DEFAULT '!',
         is_active BOOLEAN NOT NULL DEFAULT true,
@@ -115,14 +119,14 @@ async function setupDatabase() {
     `);
 
     console.log('Database setup completed successfully!');
-    
-    // Insert sample data for demonstration
+
+    // Insert sample data
     console.log('Inserting sample data...');
-    
+
     const sampleBot = await client.query(`
       INSERT INTO bots (name, token, client_id, prefix, keep_alive)
       VALUES ('Demo Bot', 'demo_token_replace_with_real', '123456789012345678', '!', true)
-      ON CONFLICT DO NOTHING
+      ON CONFLICT (client_id) DO NOTHING
       RETURNING id;
     `);
 
@@ -134,7 +138,7 @@ async function setupDatabase() {
     }
 
     console.log('Sample data inserted successfully!');
-    
+
   } catch (error) {
     console.error('Error setting up database:', error);
     throw error;

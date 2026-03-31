@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@discordjs/voice": "^0.18.0",
     "@hookform/resolvers": "^5.2.1",
     "@neondatabase/serverless": "^1.0.2",
     "@tanstack/react-query": "^5.84.0",
@@ -20,6 +21,8 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cors": "^2.8.5",
+    "discord.js": "^14.26.0",
+    "dotenv": "^17.3.1",
     "drizzle-kit": "^0.31.4",
     "drizzle-orm": "^0.44.4",
     "drizzle-zod": "^0.8.2",
@@ -35,7 +38,7 @@
     "typescript": "^5.9.2",
     "vite": "^7.0.6",
     "wouter": "^3.7.1",
-    "ws": "^8.18.3",
+    "ws": "^8.20.0",
     "zod": "^3.25.76"
   }
 }
